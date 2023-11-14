@@ -86,10 +86,25 @@ function Header() {
 }
 
 function Menu() {
+  const pizzas = pizzaData;
+  const numPizzas = pizzas.length; // if the pizzas array was empty, it would still render the ul because an empty array is a truthy value still.
+
   return (
     <main className="menu">
       <h2>Our menu</h2>
-      <Pizza
+
+      {/* rendering lists with the map method - always have a boolean value as the condition for rendering becuase react doesn't render bool values but is fine rendering others. So if we just checked numPizzas, then react would render 0 even if it short cuircuited becuase 0 is an integer and not a bool value*/}
+      {numPizzas > 0 && (
+        <ul className="pizzas">
+          {pizzaData.map((pizza) => (
+            <Pizza pizzaObject={pizza} key={pizza.name} />
+            // need to pass a unique key to each element rendered with the map method.
+            // need to use map because it creates a new array with the pizzas and we can't use for each because an array is not created.
+          ))}
+        </ul>
+      )}
+
+      {/* <Pizza
         // passing in props
         name="Pizza Spinaci"
         ingredient="Tomato, mozarella, spinach, and ricotta cheese"
@@ -103,7 +118,7 @@ function Menu() {
         ingredient="Tomato, mushrooms"
         price={12}
         photoName="pizzas/funghi.jpg"
-      />
+      /> */}
     </main>
   );
 }
@@ -111,27 +126,37 @@ function Menu() {
 function Pizza(props) {
   // the props object contains all the data and stuff that we give to the component. it's an OBJECT so we use it like a normal object.
   return (
-    <div className="pizza">
-      <img src={props.photoName} alt={props.name} />
+    <li className="pizza">
+      <img src={props.pizzaObject.photoName} alt={props.pizzaObject.name} />
       <div>
-        <h3>{props.name}</h3>
-        <p>{props.ingredient}</p>
-        <span>{props.price + 3}</span>
+        <h3>{props.pizzaObject.name}</h3>
+        <p>{props.pizzaObject.ingredient}</p>
+        <span>{props.pizzaObject.price + 3}</span>
       </div>
-    </div>
+    </li>
   );
 }
 
 function Footer() {
   const hour = new Date().getHours();
-  const openHour = 12;
+  const openHour = 8;
   const closeHour = 22;
-  if (hour >= openHour && hour <= closeHour) alert("We're currently open!");
-  else alert("We're currently closed!"); // alert is blocking so nothing renders until you click ok. And we also saw the alert rendering twice and that's becuase of the strict mode component rendering thiings twice to check for errors.
+  const isOpen = hour >= openHour && hour <= closeHour;
+  // if (hour >= openHour && hour <= closeHour) alert("We're currently open!");
+  // else alert("We're currently closed!"); // alert is blocking so nothing renders until you click ok. And we also saw the alert rendering twice and that's becuase of the strict mode component rendering thiings twice to check for errors.
   // return React.createElement("footer", null, "We're currently open"); // react create element syntax
   return (
     <footer className="footer">
-      {new Date().toLocaleTimeString}, We're currently open!
+      {/* {new Date().toLocaleTimeString}, We're currently open! */}
+      {/* conditional rendering with the and operator utilizing short curcuiting */}
+      {isOpen && (
+        <div className="order">
+          <p>
+            We're open until {closeHour}:00. Come visit us or order online.{" "}
+          </p>
+          <button className="btn">Order</button>
+        </div>
+      )}
     </footer>
   );
 }
@@ -179,3 +204,7 @@ root.render(
 // ONE WAY DATA FLOW: data can only be passed from parent to child and never the other way. -> other frameworks like angular have two way
 // reasons for this: applications are predictable and easy to understand, easy to debug, two way data is less performant.
 // clever way to get data up to the parent and stuff and we will talk about this in the next section.
+
+// JSX RULES
+// jsx rules: like html, curly braces with JS mode - only expressions inside - returns value(s), NO STATEMENTS like if, for, etc. We can
+// a piece of JSX prodcues a JS expression. (jsx converted to a create element finction call in js) so we can put jsx stuff inside of curly braces in js (since JSX is a JS expression). We can write JSX anywhere like assigning to variables etc. JSX pieces can obly have one root element and if u need more you can use a react fragment.
