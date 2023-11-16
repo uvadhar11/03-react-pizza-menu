@@ -94,7 +94,7 @@ function Menu() {
       <h2>Our menu</h2>
 
       {/* rendering lists with the map method - always have a boolean value as the condition for rendering becuase react doesn't render bool values but is fine rendering others. So if we just checked numPizzas, then react would render 0 even if it short cuircuited becuase 0 is an integer and not a bool value*/}
-      {numPizzas > 0 && (
+      {numPizzas > 0 ? (
         <ul className="pizzas">
           {pizzaData.map((pizza) => (
             <Pizza pizzaObject={pizza} key={pizza.name} />
@@ -102,7 +102,14 @@ function Menu() {
             // need to use map because it creates a new array with the pizzas and we can't use for each because an array is not created.
           ))}
         </ul>
+      ) : (
+        <p>We are still working on this menu. Please come back later</p>
       )}
+
+      {/* CONDITIONAL RENDERING OPTIONS */}
+      {/* OPTION 1: Use the AND operator and short cruicuitng stuff (so condition on the left and then the stuff u want to return/do on the right) */}
+      {/* OPTION 2 [like this one]: Use the TERNARY OPERATOR*/}
+      {/* OPTION 3: MULTIPLE RETURNS */}
 
       {/* <Pizza
         // passing in props
@@ -124,6 +131,10 @@ function Menu() {
 }
 
 function Pizza(props) {
+  // example of multiple/early returns - because this is one component and if its sold out we don't want to render anything. And the pizza list uses multiple of these components, so it isn't going to affect the entire page.
+  // this is about rendering an ENTIRE component or not, not for a specific element - use ternary operator for that
+  if (props.pizzaObj.soldOut) return null;
+
   // the props object contains all the data and stuff that we give to the component. it's an OBJECT so we use it like a normal object.
   return (
     <li className="pizza">
@@ -145,19 +156,34 @@ function Footer() {
   // if (hour >= openHour && hour <= closeHour) alert("We're currently open!");
   // else alert("We're currently closed!"); // alert is blocking so nothing renders until you click ok. And we also saw the alert rendering twice and that's becuase of the strict mode component rendering thiings twice to check for errors.
   // return React.createElement("footer", null, "We're currently open"); // react create element syntax
+
+  // conditional rendering with multiple returns - this is will return this part and not the other stuff in the return statement (this is like naearly return and stuff) - so sometimes not helpful at all. It's more for like rendering entire domponents and not pieces of JSX that make up a component.
+  if (!isOpen) return <p>We're happy to welcome you between this time</p>;
+
   return (
     <footer className="footer">
       {/* {new Date().toLocaleTimeString}, We're currently open! */}
-      {/* conditional rendering with the and operator utilizing short curcuiting */}
-      {isOpen && (
-        <div className="order">
-          <p>
-            We're open until {closeHour}:00. Come visit us or order online.{" "}
-          </p>
-          <button className="btn">Order</button>
-        </div>
+      {/* conditional rendering with the and operator utilizing short curcuiting  - changed to the and operator. */}
+      {isOpen ? (
+        <Order closeHours={closeHour} />
+      ) : (
+        <p>
+          We are happy to welcome you between {openHour}:00 and {closeHour}:00.
+        </p>
       )}
     </footer>
+  );
+}
+
+// example of taking a piece of JSX from a component and making another component for a small section in case the original component is getting too big.
+function Order(props) {
+  return (
+    <div className="order">
+      <p>
+        We're open until {props.closeHours}:00. Come visit us or order online.{" "}
+      </p>
+      <button className="btn">Order</button>
+    </div>
   );
 }
 
