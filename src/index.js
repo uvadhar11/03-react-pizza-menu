@@ -95,13 +95,21 @@ function Menu() {
 
       {/* rendering lists with the map method - always have a boolean value as the condition for rendering becuase react doesn't render bool values but is fine rendering others. So if we just checked numPizzas, then react would render 0 even if it short cuircuited becuase 0 is an integer and not a bool value*/}
       {numPizzas > 0 ? (
-        <ul className="pizzas">
-          {pizzaData.map((pizza) => (
-            <Pizza pizzaObject={pizza} key={pizza.name} />
-            // need to pass a unique key to each element rendered with the map method.
-            // need to use map because it creates a new array with the pizzas and we can't use for each because an array is not created.
-          ))}
-        </ul>
+        // this is a REACT FRAGMENT which lets you group elements without leaving a trace in the DOM tree like if you do a div, it will mess up the formatting and stuff. This allows to have more than one element in a piece of JSX - and we are able to set more than one element as a direct root element for something and stuff.
+        <>
+          {/* if u need to use a react fragment to render a list you can use <React.fragment></> then a key with it since this is like an element */}
+          <p>
+            Authentic Italian cuisine, 6 creative dishes to choose from. All
+            from our stove oven, all organic, all delicious.
+          </p>
+          <ul className="pizzas">
+            {pizzaData.map((pizza) => (
+              <Pizza pizzaObject={pizza} key={pizza.name} />
+              // need to pass a unique key to each element rendered with the map method.
+              // need to use map because it creates a new array with the pizzas and we can't use for each because an array is not created.
+            ))}
+          </ul>
+        </>
       ) : (
         <p>We are still working on this menu. Please come back later</p>
       )}
@@ -130,19 +138,22 @@ function Menu() {
   );
 }
 
-function Pizza(props) {
+function Pizza({ pizzaObject }) {
+  // we were able to destructure it above. We can see what data is passed in by doing this destructuring so you don't have to go and find it.
+
   // example of multiple/early returns - because this is one component and if its sold out we don't want to render anything. And the pizza list uses multiple of these components, so it isn't going to affect the entire page.
   // this is about rendering an ENTIRE component or not, not for a specific element - use ternary operator for that
-  if (props.pizzaObj.soldOut) return null;
+  // if (pizzaObject.soldOut) return null; // example code for multiple returns - similar to a guard clause.
 
   // the props object contains all the data and stuff that we give to the component. it's an OBJECT so we use it like a normal object.
   return (
-    <li className="pizza">
-      <img src={props.pizzaObject.photoName} alt={props.pizzaObject.name} />
+    <li className={`pizza ${pizzaObject.soldOut ? "sold-out" : ""}`}>
+      {/* since template literal is JS, we need to use the curly braces. */}
+      <img src={pizzaObject.photoName} alt={pizzaObject.name} />
       <div>
-        <h3>{props.pizzaObject.name}</h3>
-        <p>{props.pizzaObject.ingredient}</p>
-        <span>{props.pizzaObject.price + 3}</span>
+        <h3>{pizzaObject.name}</h3>
+        <p>{pizzaObject.ingredients}</p>
+        <span>{pizzaObject.soldOut ? "SOLD OUT" : pizzaObject.price}</span>
       </div>
     </li>
   );
@@ -165,7 +176,7 @@ function Footer() {
       {/* {new Date().toLocaleTimeString}, We're currently open! */}
       {/* conditional rendering with the and operator utilizing short curcuiting  - changed to the and operator. */}
       {isOpen ? (
-        <Order closeHours={closeHour} />
+        <Order closeHour={closeHour} openHour={openHour} />
       ) : (
         <p>
           We are happy to welcome you between {openHour}:00 and {closeHour}:00.
@@ -176,11 +187,13 @@ function Footer() {
 }
 
 // example of taking a piece of JSX from a component and making another component for a small section in case the original component is getting too big.
-function Order(props) {
+function Order({ closeHour, openHour }) {
+  // if u try to desctructure a property that doesnt exist it will be undefined.
   return (
     <div className="order">
       <p>
-        We're open until {props.closeHours}:00. Come visit us or order online.{" "}
+        We're open from {openHour}:00 until {closeHour}:00. Come visit us or
+        order online.{" "}
       </p>
       <button className="btn">Order</button>
     </div>
@@ -234,3 +247,5 @@ root.render(
 // JSX RULES
 // jsx rules: like html, curly braces with JS mode - only expressions inside - returns value(s), NO STATEMENTS like if, for, etc. We can
 // a piece of JSX prodcues a JS expression. (jsx converted to a create element finction call in js) so we can put jsx stuff inside of curly braces in js (since JSX is a JS expression). We can write JSX anywhere like assigning to variables etc. JSX pieces can obly have one root element and if u need more you can use a react fragment.
+
+// if we have things like 3 options, we can use a span and use the and operator to set the text content stuff.
